@@ -20,6 +20,11 @@
 - `data`: lost_items.csv, maps/(약도 이미지), item_photos/(분실물 사진)
 - `docs`: 발표 자료
 
+## 문서
+
+- [시스템 설계 문서](docs/ARCHITECTURE.md): 아키텍처, 클래스 다이어그램, 화면 흐름도, 데이터·메서드 명세
+- [발표 자료](docs/presentation.pdf)
+
 ## 실행 방법
 
 - Eclipse: 프로젝트 Import 후 `LostFoundApp.java` 실행
