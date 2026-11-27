@@ -116,10 +116,10 @@ public class LostItemController {
         itemRepository.rewriteAll(lostItems);
     }
 
-    public List<LostItem> getItemsByMapName(String mapName) {
+    public List<LostItem> getItemsByMapName(String mapName) { // 약도에는 보관 중인 분실물만 표시
         List<LostItem> result = new ArrayList<>();
         for (LostItem item : lostItems) {
-            if (item.getMapName().equals(mapName)) {
+            if (item.getStatus() == ItemStatus.STORED && item.getMapName().equals(mapName)) {
                 result.add(item);
             }
         }

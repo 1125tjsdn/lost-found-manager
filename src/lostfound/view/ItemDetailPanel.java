@@ -150,10 +150,11 @@ public class ItemDetailPanel extends JPanel {
         p.add(new JLabel("찾아간 사람")); p.add(nameF);
         p.add(new JLabel("연락처 (숫자 11자리)")); p.add(contactF);
         int res = JOptionPane.showConfirmDialog(this, p, "수령 정보 입력", JOptionPane.OK_CANCEL_OPTION);
-        if (res == JOptionPane.OK_OPTION && validateReturnInput(nameF.getText(), contactF.getText())) {
-            String contact = contactF.getText();
+        String name = nameF.getText().trim();
+        String contact = contactF.getText().trim();
+        if (res == JOptionPane.OK_OPTION && validateReturnInput(name, contact)) {
             String formattedContact = contact.substring(0, 3) + "-" + contact.substring(3, 7) + "-" + contact.substring(7);
-            controller.returnItem(currentItem.getId(), nameF.getText(), formattedContact);
+            controller.returnItem(currentItem.getId(), name, formattedContact);
             JOptionPane.showMessageDialog(this, "수령 완료 처리가 되었습니다.");
             frame.showReturnedPanel();
         }

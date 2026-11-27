@@ -34,6 +34,8 @@ public class SelectMapPanel extends JPanel {
     private final LostItemController controller;
 
     private String selectedMapName;
+    private JComboBox<String> mapBox;
+    private boolean updatingMapBox; // 코드로 콤보박스를 바꿀 때 리스너가 중복 동작하지 않도록 함
     private JScrollPane mapPane;
     private SelectMapImagePanel currentMapPanel;
 
@@ -51,6 +53,12 @@ public class SelectMapPanel extends JPanel {
     }
 
     public void setup(String mapName) {
+        updatingMapBox = true;
+        mapBox.removeAllItems();
+        for (String name : controller.getMapNames()) mapBox.addItem(name);
+        mapBox.setSelectedItem(mapName); // 등록 화면에서 고른 지도와 콤보박스를 일치시킴
+        updatingMapBox = false;
+
         this.selectedMapName = mapName;
         changeMap(mapName);
     }
@@ -59,10 +67,11 @@ public class SelectMapPanel extends JPanel {
         JPanel topPanel = new JPanel(new BorderLayout());
 
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        JComboBox<String> mapBox = new JComboBox<>();
+        mapBox = new JComboBox<>();
         for (String name : controller.getMapNames()) mapBox.addItem(name);
-        mapBox.setSelectedItem(selectedMapName);
-        mapBox.addActionListener(e -> changeMap((String) mapBox.getSelectedItem()));
+        mapBox.addActionListener(e -> {
+            if (!updatingMapBox) changeMap((String) mapBox.getSelectedItem());
+        });
 
         controlPanel.add(new JLabel("지도 선택"));
         controlPanel.add(mapBox);

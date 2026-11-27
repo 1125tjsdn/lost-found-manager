@@ -39,6 +39,7 @@ public class RegisterPanel extends JPanel {
     private String selectedImagePath = ""; // 이미지 위치 
     private int selectedX = LostItem.NO_COORDINATE; // x좌표 값
     private int selectedY = LostItem.NO_COORDINATE; // y좌표 값
+    private String coordinateMapName = null; // 좌표를 찍은 지도 이름, 지도를 바꾸면 좌표가 맞지 않으므로 초기화하기 위함
 
     public RegisterPanel(LostFoundFrame frame, LostItemController controller) {
         this.frame = frame;
@@ -63,6 +64,7 @@ public class RegisterPanel extends JPanel {
         for (String mapName : controller.getMapNames()) {
             mapBox.addItem(mapName);
         }
+        mapBox.addActionListener(e -> resetCoordinateIfMapChanged());
         descriptionArea = new JTextArea(5, 24); // 높이, 넓이
         imageStatusLabel = new JLabel("선택 안 됨");
         coordinateLabel = new JLabel("선택 안 됨");
@@ -176,10 +178,21 @@ public class RegisterPanel extends JPanel {
     }
 
     public void setCoordinate(String mapName, int x, int y) {
+        coordinateMapName = mapName; // 콤보박스를 바꾸기 전에 설정해야 좌표가 초기화되지 않음
         mapBox.setSelectedItem(mapName);
         this.selectedX = x;
         this.selectedY = y;
         coordinateLabel.setText("선택됨");
+    }
+
+    // 좌표를 찍은 뒤 다른 지도로 바꾸면 이전 지도의 좌표가 남지 않도록 초기화
+    private void resetCoordinateIfMapChanged() {
+        if (coordinateMapName != null && !coordinateMapName.equals(mapBox.getSelectedItem())) {
+            selectedX = LostItem.NO_COORDINATE;
+            selectedY = LostItem.NO_COORDINATE;
+            coordinateMapName = null;
+            coordinateLabel.setText("선택 안 됨");
+        }
     }
 
     private boolean validateInput(String mapName) {
@@ -189,10 +202,6 @@ public class RegisterPanel extends JPanel {
         }
         if (nameField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(frame, "물건명을 입력하세요.");
-            return false;
-        }
-        if (nameField.getText().contains(",") || descriptionArea.getText().contains(",")) {
-            JOptionPane.showMessageDialog(frame, "쉼표(,)는 입력할 수 없습니다.");
             return false;
         }
         return true;
@@ -210,6 +219,7 @@ public class RegisterPanel extends JPanel {
         selectedImagePath = "";
         selectedX = LostItem.NO_COORDINATE;
         selectedY = LostItem.NO_COORDINATE;
+        coordinateMapName = null;
         imageStatusLabel.setText("선택 안 됨");
         coordinateLabel.setText("선택 안 됨");
     }

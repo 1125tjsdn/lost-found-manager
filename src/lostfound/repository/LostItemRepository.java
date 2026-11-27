@@ -51,8 +51,11 @@ public class LostItemRepository {
             
             String line;
             while ((line = reader.readLine()) != null) {
-                if (!line.isEmpty()) {
+                if (line.isEmpty()) continue;
+                try {
                     list.add(parseLine(line));
+                } catch (RuntimeException e) { // 깨진 행 하나 때문에 프로그램이 시작되지 않는 것을 방지
+                    System.err.println("잘못된 행을 건너뜁니다: " + line);
                 }
             }
         } catch (IOException e) {
@@ -79,35 +82,69 @@ public class LostItemRepository {
         String[] v = line.split(",", -1); // 빈 값도 가져옴
         return new LostItem(
                 Integer.parseInt(v[0]),
-                v[1],
+                unescape(v[1]),
                 parseCategory(v[2]),
-                v[3],
-                v[4], 
-                v[5], 
-                v[6], 
+                unescape(v[3]),
+                unescape(v[4]),
+                unescape(v[5]),
+                unescape(v[6]),
                 Integer.parseInt(v[7]),
                 Integer.parseInt(v[8]),
                 parseStatus(v[9]),
-                v[10],
-                v[11],
-                v[12]);
+                unescape(v[10]),
+                unescape(v[11]),
+                unescape(v[12]));
+    }
+
+    // CSV 구분자(쉼표)와 줄바꿈이 값에 들어 있어도 행이 깨지지 않도록 변환
+    // \ -> \\, 쉼표 -> \c, 줄바꿈 -> \n, 캐리지리턴 -> \r
+    private String escape(String s) {
+        if (s == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (char ch : s.toCharArray()) {
+            switch (ch) {
+                case '\\': sb.append("\\\\"); break;
+                case ',': sb.append("\\c"); break;
+                case '\n': sb.append("\\n"); break;
+                case '\r': sb.append("\\r"); break;
+                default: sb.append(ch);
+            }
+        }
+        return sb.toString();
+    }
+
+    private String unescape(String s) {
+        if (s.indexOf('\\') < 0) return s;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if (ch == '\\' && i + 1 < s.length()) {
+                char next = s.charAt(i + 1);
+                if (next == 'c') { sb.append(','); i++; continue; }
+                if (next == 'n') { sb.append('\n'); i++; continue; }
+                if (next == 'r') { sb.append('\r'); i++; continue; }
+                if (next == '\\') { sb.append('\\'); i++; continue; }
+            }
+            sb.append(ch);
+        }
+        return sb.toString();
     }
 
     private String toCsvLine(LostItem item) { // csv 형식 변환
         return String.join(",",
                 String.valueOf(item.getId()),
-                item.getName(),
+                escape(item.getName()),
                 item.getCategory().name(),
-                item.getMapName(),
-                item.getRegisteredDate(),
-                item.getDescription(),
-                item.getImagePath(),
+                escape(item.getMapName()),
+                escape(item.getRegisteredDate()),
+                escape(item.getDescription()),
+                escape(item.getImagePath()),
                 Integer.toString(item.getX()),
                 Integer.toString(item.getY()),
                 item.getStatus().name(),
-                item.getReceiverName(),
-                item.getReceiverContact(),
-                item.getReturnedDate());
+                escape(item.getReceiverName()),
+                escape(item.getReceiverContact()),
+                escape(item.getReturnedDate()));
     }
 
     public int getNextId(List<LostItem> items) { 

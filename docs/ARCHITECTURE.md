@@ -125,6 +125,9 @@ flowchart TD
 | receiverContact | String | 수령자 연락처 (`010-0000-0000` 형식) |
 | returnedDate | String | 수령 일시 (자동) |
 
+- 특수문자 처리: 값에 포함된 `\`, 쉼표, 줄바꿈은 `\\`, `\c`, `\n`, `\r`로 변환하여 저장하고 읽을 때 복원
+- 잘못된 형식의 행은 건너뛰어 프로그램 시작에 영향을 주지 않음
+
 ## 5. Controller 메서드 명세
 
 | 메서드 | 입력 | 반환 | 동작 |
@@ -138,7 +141,7 @@ flowchart TD
 | `updateStatus(id, status)` | id, 상태 | - | 상태 변경 (보관 중으로 복원 시 수령 정보 초기화) |
 | `deleteItem(id)` | id | - | 항목과 사진 파일 삭제 |
 | `clearReturnedItems()` | - | - | 수령 완료 항목 전체 삭제 |
-| `getItemsByMapName(mapName)` | 층 이름 | List | 해당 층 분실물 목록 |
+| `getItemsByMapName(mapName)` | 층 이름 | List | 해당 층의 보관 중 분실물 목록 (약도 마커용) |
 | `getMapNames()` | - | List | `data/maps/`의 약도 이름 목록 |
 | `getMapFile(mapName)` | 층 이름 | File | 약도 이미지 파일 |
 
@@ -146,8 +149,7 @@ flowchart TD
 
 ## 6. 제한 사항
 
-- 물건명과 비고에 쉼표(,) 입력 불가 (CSV 구분자 충돌)
-- 비고에 줄바꿈을 입력하면 CSV 행이 깨질 수 있음 (별도 처리 없음)
+- 저장 실패(디스크 오류 등)를 화면에 알리지 않고 콘솔에만 출력함
 - 단일 사용자 전용, 관리자/사용자 권한 구분 없음
 - 실행 위치 기준 상대경로로 `data/`를 읽으므로 프로젝트 루트에서 실행해야 함
 - 수령자 연락처가 평문으로 저장됨
