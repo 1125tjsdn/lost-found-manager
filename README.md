@@ -1,7 +1,7 @@
 # 분실물 관리 프로그램 (LostFound)
 
 - Java Swing 기반 GUI 분실물 관리 프로그램
-- 개인 프로젝트 / Java 21, Eclipse
+- Java 21, Eclipse
 
 ## 주요 기능
 
